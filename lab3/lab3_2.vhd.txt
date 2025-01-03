@@ -1,0 +1,75 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+use IEEE.STD_LOGIC_arith.ALL;
+entity botao is
+ generic (fclk: integer := 50_000; 
+ twindown: integer := 10); 
+ Port ( ena : in STD_LOGIC;
+ clk : in STD_LOGIC;
+ rst : in STD_LOGIC;
+ bt : in STD_LOGIC;
+ up_down : in STD_LOGIC; 
+ S : out STD_LOGIC_VECTOR (6 downto 0);
+ anodo : out STD_LOGIC_VECTOR (3 downto 0));
+end botao;
+architecture Behavioral of botao is 
+ signal temp: std_logic := '0'; 
+ signal count: integer range 0 to (fclk * twindown) := 0;
+ constant max: integer := 5;
+ signal D : STD_LOGIC_VECTOR (3 downto 0); 
+ 
+begin
+process (clk, rst)
+ begin
+ if rst = '1' then
+ count <= 0;
+ temp <= '0'; 
+ elsif (clk'event and clk='1') then
+ if(temp /= bt) then
+ count <= count + 1; 
+ if (count = max) then
+ temp <= bt;
+ count <= 0; 
+ end if;
+ else
+ count <= 0; 
+
+ end if;
+ end if;
+end process;
+process(rst, temp)
+ variable contad: natural range 0 to 9 := 0; 
+ begin
+ if rst = '1' then
+ contad := 0;
+ elsif (ena='1' and temp'event and temp = '1') then
+ if contad = 9 and up_down = '1' then
+ contad := 0; 
+ elsif contad = 0 and up_down = '0' then
+ contad := 9; 
+ else
+ if up_down = '1' then
+ contad := contad + 1; 
+ else
+ contad := contad - 1; 
+ end if;
+ end if; 
+ end if;
+ D <= std_logic_vector(to_unsigned(contad, 4)); 
+ end process;
+ anodo <= "1110"; 
+ 
+ S <= "0000001" when D = "0000" else
+ "1001111" when D = "0001" else
+ "0010010" when D = "0010" else
+ "0000110" when D = "0011" else
+ "1001100" when D = "0100" else
+ "0100100" when D = "0101" else
+ "0100000" when D = "0110" else
+ "0001111" when D = "0111" else
+ "0000000" when D = "1000" else
+ "0001100" when D = "1001" else
+ "1111111"; 
+
+end Behavioral;

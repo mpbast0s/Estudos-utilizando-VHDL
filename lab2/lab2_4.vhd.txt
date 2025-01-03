@@ -1,0 +1,44 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.all;
+entity Circuito_aritmetico is
+generic(N: integer:=2)
+ Port ( a : in STD_LOGIC_VECTOR (N-1 downto 0);
+ b : in STD_LOGIC_VECTOR (N-1 downto 0);
+ cin : in STD_LOGIC;
+ opcode : in STD_LOGIC_VECTOR (2 downto 0);
+ y : out STD_LOGIC_VECTOR (N-1 downto 0);
+ cout : out STD_LOGIC);
+end Circuito_aritmetico;
+architecture Behavioral of Circuito_aritmetico is
+signal a_sig , b_sig: signed (N-1 downto 0);
+signal a_unsig, b_unsig: unsigned (N-1 downto 0);
+signal y_sig : signed (N downto 0);
+signal y_unsig : unsigned (N downto 0);
+begin
+a_sig <= signed(a);
+b_sig <= signed(b);
+a_unsig <= unsigned(a);
+b_unsig <= unsigned(b);
+-- signed:
+y_sig <= (a_sig(N-1) & a_sig) + (b_sig(N-1) & b_sig) when
+opcode="100"else
+(a_sig(N-1) & a_sig) - (b_sig(N-1) & b_sig) when
+opcode="101"else
+-(a_sig(N-1) & a_sig) + (b_sig(N-1) & b_sig) when
+opcode="110"else
+(a_sig(N-1) & a_sig) + (b_sig(N-1) & b_sig) + ('0' & cin) when
+opcode="111";
+-- unsig:
+y_unsig <= ('0' & a_unsig) + ('0' & b_unsig) when opcode="000"else
+('0' & a_unsig) - ('0' & b_unsig) when
+opcode="001"else
+('0' & b_unsig) - ('0' & a_unsig) when
+opcode="010"else
+('0' & a_unsig) + ('0' & b_unsig) + ('0' & cin) 
+when opcode="011";
+y <= std_logic_vector(y_sig(N-1 downto 0)) when opcode(2)='1' else
+std_logic_vector(y_unsig(N-1 downto 0));
+cout <= std_logic(y_sig(N)) when opcode(2)='1' else
+std_logic(y_unsig(N));
+end Behavioral;

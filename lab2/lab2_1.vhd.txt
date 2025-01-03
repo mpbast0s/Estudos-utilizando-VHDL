@@ -1,0 +1,22 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity dec_bcd_sete_seg is
+ Port ( D : in STD_LOGIC_VECTOR (3 downto 0);
+ S : out STD_LOGIC_VECTOR (6 downto 0);
+ anodo: out STD_logic_vector (3 downto 0));
+end dec_bcd_sete_seg;
+architecture Behavioral of dec_bcd_sete_seg is
+begin
+anodo <= "1110";
+S <= "0000001" WHEN D="0000" ELSE
+ "1001111" WHEN D="0001" ELSE
+ "0010010" WHEN D="0010" ELSE
+ "0000110" WHEN D="0011" ELSE
+ "1001100" WHEN D="0100" ELSE
+ "0100100" WHEN D="0101" ELSE
+ "0100000" WHEN D="0110" ELSE
+ "0001111" WHEN D="0111" ELSE
+ "0000000" WHEN D="1000" ELSE
+ "0001100" WHEN D="1001" ELSE
+ "1111111" ;
+end Behavioral;

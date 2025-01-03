@@ -1,0 +1,48 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_arith.ALL
+use IEEE.NUMERIC_STD.ALL;entity Temporizador is
+ Port ( ena : in STD_LOGIC;
+ clk : in STD_LOGIC;
+ rst : in STD_LOGIC;
+ s : out STD_LOGIC_VECTOR (6 downto 0);
+ anodo: out STD_logic_vector (3 downto 0))
+ ;
+end Temporizador;
+architecture Behavioral of Temporizador is
+signal D : STD_logic_vector (3 downto 0); 
+begin
+process(rst, clk)
+variable temp : natural range 0 to 25_000_000;
+variable contad : natural range 0 to 9;
+begin
+if(rst='1') then
+temp := 0;
+contad := 0;
+elsif(clk'event and clk='1' and ena='1') then
+if(ena='1') then
+temp := temp +1;
+if(temp = 5) then
+temp := 0;
+contad := contad +1;
+if(contad = 10) then
+contad := 0; 
+end if;
+end if;
+end if;
+D <= conv_STD_LOGIC_VECTOR(contad, 4);
+end if;
+end process;
+anodo <= "1110";
+S <= "0000001" WHEN D="0000" ELSE
+ "1001111" WHEN D="0001" ELSE
+ "0010010" WHEN D="0010" ELSE
+ "0000110" WHEN D="0011" ELSE
+ "1001100" WHEN D="0100" ELSE
+ "0100100" WHEN D="0101" ELSE
+ "0100000" WHEN D="0110" ELSE
+ "0001111" WHEN D="0111" ELSE
+ "0000000" WHEN D="1000" ELSE
+ "0001100" WHEN D="1001" ELSE
+ "1111111" ;
+end Behavioral;
